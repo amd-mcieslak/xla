@@ -94,6 +94,12 @@ absl::StatusOr<RunConvOptions> ConvolutionThunk::GetOrCreate(
   return RunConvOptions{nullptr, &**runner_states_.Find(device_ordinal)};
 }
 
+absl::Status ConvolutionThunk::Initialize(const InitializeParams& params) {
+  ABSL_ASSIGN_OR_RETURN(RunConvOptions opts,
+                        GetOrCreate(config_, params.stream));
+  return InitializeGpuConvRunner(config_, params.stream, *opts.runner_cache);
+}
+
 absl::Status ConvolutionThunk::ExecuteOnStream(const ExecuteParams& params) {
   VLOG(5) << "ConvolutionThunk";
   const auto& buffer_allocations = *params.buffer_allocations;

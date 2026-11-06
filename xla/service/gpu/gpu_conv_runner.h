@@ -228,6 +228,12 @@ absl::Status RunGpuConv(const GpuConvConfig& conv_config,
                         se::DeviceAddressBase scratch_memory,
                         se::Stream* stream, RunConvOptions = {});
 
+// Creates the runner in `runner_cache` for `conv_config`. Call outside of any
+// stream capture.
+absl::Status InitializeGpuConvRunner(const GpuConvConfig& conv_config,
+                                     se::Stream* stream,
+                                     GenericConvRunner& runner_cache);
+
 // Struct to describe properties of a convolution without being tied to specific
 // IR. Will be used to help build Convolution thunks from either XLA HLO or
 // LHLO GPU dialect in MLIR.
