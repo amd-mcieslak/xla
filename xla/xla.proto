@@ -716,6 +716,12 @@ message DebugOptions {
   // in the CollectivesRegistry.
   optional string xla_gpu_collectives_implementation = 468;
 
+  // With COLLECTIVES in `xla_gpu_enable_command_buffer` and the SKIP_TEMP or
+  // SKIP_PROFILED update mode, keeps buffers of collectives that may be
+  // recorded into command buffers out of output allocations, so the
+  // collectives are not re-recorded on every execution. Costs temp memory.
+  optional bool xla_gpu_command_buffer_keep_collectives_out_of_outputs = 568;
+
   optional CommandBufferSchedulingMode xla_gpu_command_buffer_scheduling_mode =
       404;
 
@@ -2006,7 +2012,7 @@ message DebugOptions {
   // independent small-grid GPU kernels.
   optional bool xla_gpu_experimental_enable_horizontal_fusion = 565;
 
-  // Next id: 567
+  // Next id: 569
 
   // Extra options to pass to the compilation backend (e.g. LLVM); specific
   // interpretation of these values is left to the backend.
