@@ -196,6 +196,13 @@ class MoriCommunicator : public GpuCommunicator {
   // Executes f on executor_, or calls f directly if executor_ is null.
   Future<> Execute(absl::AnyInvocable<absl::Status() &&> f) const;
 
+  // Runs `launch` with is_async = is_async_, except inside a group: there an
+  // async launch is held until the next one (which flushes it sync) or the end
+  // of the outermost GroupLaunch (which runs it async), so at most one per
+  // group is left pending for AsyncDone.
+  absl::Status LaunchOrDefer(
+      absl::AnyInvocable<absl::Status(bool is_async) &&> launch);
+
   MoriCommunicator(std::shared_ptr<CancellationToken> cancel)
       : cancel_(std::move(cancel)) {}
 
@@ -207,6 +214,9 @@ class MoriCommunicator : public GpuCommunicator {
   // Do the following collective launches belong to an async start/done pair?
   // Read by the Launch* methods, so Execute must run them synchronously.
   bool is_async_ = false;
+  // GroupLaunch nesting depth and the async launch held back within it.
+  int group_depth_ = 0;
+  absl::AnyInvocable<absl::Status(bool) &&> deferred_;
 };
 
 }  // namespace xla::gpu
